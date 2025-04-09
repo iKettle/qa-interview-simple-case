@@ -32,4 +32,25 @@ test.describe('Sign up page ', () => {
     await expect(page.getByRole('button').getByText('Log out')).toBeVisible()
   })
 
+  test('signup with existing user', {
+    annotation: {
+      type: 'issue',
+      description: 'Should be raised a ticket for showing error message when existing user trying to signup',
+    },
+  }, async ({ page }) => {
+    await signupPage.inputFirstName(existingUser.firstName)
+    await signupPage.inputLastName(existingUser.lastName)
+    await signupPage.inputEmail(existingUser.email)
+    await signupPage.inputPassword(existingUser.password)
+    
+    const logs:string[] = []
+    page.on('console', msg => logs.push(msg.text()))
+
+    await signupPage.clickSubmit()
+
+    expect(logs).toContain('User already exists')
+
+    //Here should be proper assertions after implementation of error message
+  })
+
 })
