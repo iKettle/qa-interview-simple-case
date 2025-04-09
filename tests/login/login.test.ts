@@ -22,4 +22,14 @@ test.describe('login form tests', () => {
     await expect(page.getByRole('button').getByText('Log out')).toBeVisible()
   })
 
+  test('logging in with invalid credentials', async ({ page }) => {
+
+    await loginPage.inputEmail('testemail@test.com')
+    await loginPage.inputPassword('testpassword')
+    await loginPage.clickLogin()
+
+    await expect(page.getByText('Invalid credentials')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible()
+  })
+
 })
