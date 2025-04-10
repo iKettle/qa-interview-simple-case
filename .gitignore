@@ -6,3 +6,4 @@ dist-ssr
 *.local
 playwright/
 *.idea
+playwright-report/
