@@ -1,6 +1,7 @@
 import { type Locator, type Page } from '@playwright/test';
+import { User } from '../../src/App';
 
-export class SignupPage{
+export class SignupPage {
   readonly page: Page;
   readonly firstNameField: Locator;
   readonly lastNameField: Locator;
@@ -23,19 +24,19 @@ export class SignupPage{
     await this.page.goto('/signup');
   }
 
-  async inputFirstName(firstName) {
+  async inputFirstName(firstName: string) {
     await this.firstNameField.fill(firstName);
   }
 
-  async inputLastName(lastName) {
+  async inputLastName(lastName: string) {
     await this.lastNameField.fill(lastName);
   }
 
-  async inputEmail(email) {
+  async inputEmail(email: string) {
     await this.emailField.fill(email);
   }
 
-  async inputPassword(password) {
+  async inputPassword(password: string) {
     await this.passwordField.fill(password);
   }
 
@@ -45,6 +46,13 @@ export class SignupPage{
 
   async clickLoginLink() {
     await this.loginLink.click();
+  }
+
+  async fillInUserForm(user: User) {
+    await this.inputFirstName(user.firstName);
+    await this.inputLastName(user.lastName);
+    await this.inputEmail(user.email);
+    await this.inputPassword(user.password);
   }
 
 }

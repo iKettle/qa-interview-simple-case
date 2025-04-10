@@ -11,12 +11,16 @@ export class AccountPage {
     this.logoutButton = page.getByRole('button').getByText('Log out');
   }
     
-  async getWelcomeText() {
+  get getWelcomeText() {
     return this.welcomeText;
   }
 
-  async getLogoutButton() {
+  get getLogoutButton() {
     return this.logoutButton;
+  }
+
+  async logout() {
+    await this.logoutButton.click();
   }
 
 }

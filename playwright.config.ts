@@ -16,6 +16,7 @@ export default defineConfig({
         // Use "database" with existing accounts
         storageState: setupFile,
         baseURL: 'http://localhost:8080',
+        screenshot: 'on',
       },
       dependencies: ['setup'],
     },

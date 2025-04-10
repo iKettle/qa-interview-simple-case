@@ -1,4 +1,5 @@
 import { type Locator, type Page } from '@playwright/test';
+import { User } from '../../src/App';
 
 export class LoginPage {
   readonly page: Page;
@@ -19,11 +20,11 @@ export class LoginPage {
     await this.page.goto('/login');
   }
 
-  async inputEmail(email) {
+  async inputEmail(email: string) {
     await this.emailField.fill(email);
   }
 
-  async inputPassword(password) {
+  async inputPassword(password: string) {
     await this.passwordField.fill(password);
   }
 
@@ -33,5 +34,11 @@ export class LoginPage {
   
   async clickSignupLink() {
     await this.signupLink.click();
+  }
+
+  async loginUser(user: User) {
+    await this.inputEmail(user.email);
+    await this.inputPassword(user.password);
+    await this.clickLogin();
   }
 }

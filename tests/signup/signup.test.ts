@@ -3,14 +3,11 @@ import { SignupPage } from './SignupPage';
 import { AccountPage } from '../account/AccountPage';
 import { existingUsers } from '../../test-setup/localstorage.setup';
 import { LoginPage } from '../login/LoginPage';
+import { User } from '../../src/App';
+import { getNewUser } from '../userGenerator';
 
 const existingUser = existingUsers[0];
-const newUser = {
-  email: 'newtest1@mail.com',
-  password: 'newTestPassword!',
-  firstName: 'NewTest1',
-  lastName: 'NewTestsson1',
-}
+let newUser: User;
 let signupPage: SignupPage;
 let accountPage: AccountPage;
 
@@ -18,6 +15,8 @@ test.describe('Sign up page ', () => {
   test.beforeEach(async ({ page }) => {
     signupPage = new SignupPage(page);
     accountPage = new AccountPage(page);
+    newUser = getNewUser();
+
     await signupPage.goto();
   })
 
@@ -25,36 +24,28 @@ test.describe('Sign up page ', () => {
     //Here should be code that removes newly created users from db
   })
 
-  test('register a new user', async ({ }) => {
-    await signupPage.inputFirstName(newUser.firstName);
-    await signupPage.inputLastName(newUser.lastName);
-    await signupPage.inputEmail(newUser.email);
-    await signupPage.inputPassword(newUser.password);
+  test('register a new user', async ({}) => {
+    await signupPage.fillInUserForm(newUser);
     await signupPage.clickSubmit();
 
-    await expect(await accountPage.getWelcomeText()).toBeVisible();
-    await expect(await accountPage.getWelcomeText()).toHaveText(`Welcome ${newUser.firstName} ${newUser.lastName}`);
-    await expect(await accountPage.getLogoutButton()).toBeVisible();
+    await expect(accountPage.getWelcomeText).toBeVisible();
+    await expect(accountPage.getWelcomeText).toHaveText(`Welcome ${newUser.firstName} ${newUser.lastName}`);
+    await expect(accountPage.getLogoutButton).toBeVisible();
   })
 
   test('register a new user and login with it', async ({ page }) => {
-    await signupPage.inputFirstName(newUser.firstName);
-    await signupPage.inputLastName(newUser.lastName);
-    await signupPage.inputEmail(newUser.email);
-    await signupPage.inputPassword(newUser.password);
+    const welcomeMessage = `Welcome ${newUser.firstName} ${newUser.lastName}`;
+
+    await signupPage.fillInUserForm(newUser);
     await signupPage.clickSubmit();
 
-    await expect(await accountPage.getWelcomeText()).toBeVisible();
-    await expect(await accountPage.getWelcomeText()).toHaveText(`Welcome ${newUser.firstName} ${newUser.lastName}`);
-    await (await accountPage.getLogoutButton()).click();
+    await expect(accountPage.getWelcomeText).toHaveText(welcomeMessage);
+    await accountPage.logout();
 
     const loginPage = new LoginPage(page);
-    await loginPage.inputEmail(newUser.email);
-    await loginPage.inputPassword(newUser.password);
-    await loginPage.clickLogin();
+    await loginPage.loginUser(newUser);
 
-    await expect(await accountPage.getWelcomeText()).toBeVisible();
-    await expect(await accountPage.getWelcomeText()).toHaveText(`Welcome ${newUser.firstName} ${newUser.lastName}`);
+    await expect(accountPage.getWelcomeText).toHaveText(welcomeMessage);
   })
 
   test('signup with existing user', {
@@ -62,14 +53,11 @@ test.describe('Sign up page ', () => {
       type: 'issue',
       description: 'A ticket should be raised for showing error message when existing user trying to signup',
     }
-  }, async ({ page }) => {
-    await signupPage.inputFirstName(existingUser.firstName);
-    await signupPage.inputLastName(existingUser.lastName);
-    await signupPage.inputEmail(existingUser.email);
-    await signupPage.inputPassword(existingUser.password);
+  }, async ({}) => {
+    await signupPage.fillInUserForm(existingUser);
 
     const logs: string[] = [];
-    page.on('console', msg => logs.push(msg.text()));
+    signupPage.page.on('console', msg => logs.push(msg.text()));
 
     await signupPage.clickSubmit();
 
@@ -78,10 +66,8 @@ test.describe('Sign up page ', () => {
   })
 
   test('handling too short password', async ({ }) => {
-    await signupPage.inputFirstName(newUser.firstName);
-    await signupPage.inputLastName(newUser.lastName);
-    await signupPage.inputEmail(newUser.email);
-    await signupPage.inputPassword('12345678');
+    newUser.password = '12345678';
+    await signupPage.fillInUserForm(newUser);
 
     await expect(signupPage.submitButton).toBeDisabled();
   })
