@@ -24,8 +24,8 @@ test.describe('login form tests', () => {
 
     await loginPage.loginUser(invalidUserCreds);
 
-    await expect(page.getByText('Invalid credentials')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
+    await expect(loginPage.getInvalidCredentialsMessage).toBeVisible();
+    await expect(loginPage.loginButton).toBeVisible();
   })
 
 })
