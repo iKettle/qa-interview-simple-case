@@ -20,7 +20,7 @@ export class SignupPage{
     }
   
     async goto() {
-      await this.page.goto('localhost:8080/signup');
+      await this.page.goto('/signup');
     }
 
     async inputFirstName(firstName) {
