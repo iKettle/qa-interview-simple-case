@@ -1,29 +1,28 @@
 import { test, expect } from '@playwright/test';
 import { existingUsers } from '../../test-setup/localstorage.setup';
 import { LoginPage } from './LoginPage';
+import { User } from '../../src/App';
 
 const existingUser = existingUsers[0];
-let  loginPage:LoginPage;
+let loginPage: LoginPage;
 
 test.describe('login form tests', () => {
-  test.beforeEach(async ({page}) => {
+  test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     await loginPage.goto();
   })
 
-  test('logging in with existing account', async ({ page }) => {
-    await loginPage.inputEmail(existingUser.email);
-    await loginPage.inputPassword(existingUser.password);
-    await loginPage.clickLogin();
+  test('log in with existing account', async ({ page }) => {
+    await loginPage.loginUser(existingUser);
 
     await expect(page.getByText(`Welcome ${existingUser.firstName} ${existingUser.lastName}`)).toBeVisible();
     await expect(page.getByRole('button').getByText('Log out')).toBeVisible();
   })
 
-  test('logging in with invalid credentials', async ({ page }) => {
-    await loginPage.inputEmail('testemail@test.com');
-    await loginPage.inputPassword('testpassword');
-    await loginPage.clickLogin();
+  test('log in with invalid credentials', async ({ page }) => {
+    const invalidUserCreds: User = { email: 'testemail@test.com', password: 'testpassword', firstName: '', lastName: '' }
+
+    await loginPage.loginUser(invalidUserCreds);
 
     await expect(page.getByText('Invalid credentials')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible();
