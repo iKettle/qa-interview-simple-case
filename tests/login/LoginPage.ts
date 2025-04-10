@@ -5,6 +5,7 @@ export class LoginPage {
   readonly page: Page;
   readonly emailField: Locator;
   readonly passwordField: Locator;
+  readonly invalidCredentialsMessage: Locator;
   readonly loginButton: Locator;
   readonly signupLink: Locator;
 
@@ -14,6 +15,7 @@ export class LoginPage {
     this.passwordField = page.locator('#password');
     this.loginButton = page.getByRole('button', {name: 'Login'});
     this.signupLink = page.getByRole('link', {name: 'Signup'});
+    this.invalidCredentialsMessage = page.getByText('Invalid credentials');
   }
 
   async goto() {
@@ -40,5 +42,13 @@ export class LoginPage {
     await this.inputEmail(user.email);
     await this.inputPassword(user.password);
     await this.clickLogin();
+  }
+
+  get getInvalidCredentialsMessage() {
+    return this.invalidCredentialsMessage;
+  }
+
+  get getLoginButton() {
+    return this.loginButton;
   }
 }
