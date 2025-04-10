@@ -1,7 +1,8 @@
-import { test, expect, Page } from '@playwright/test'
-import { SignupPage } from './SignupPage'
-import { AccountPage } from '../account/AccountPage'
-import { existingUsers } from '../../test-setup/localstorage.setup'
+import { test, expect, Page } from '@playwright/test';
+import { SignupPage } from './SignupPage';
+import { AccountPage } from '../account/AccountPage';
+import { existingUsers } from '../../test-setup/localstorage.setup';
+import { LoginPage } from '../login/LoginPage';
 
 const existingUser = existingUsers[0];
 const newUser = {
@@ -31,8 +32,29 @@ test.describe('Sign up page ', () => {
     await signupPage.inputPassword(newUser.password);
     await signupPage.clickSubmit();
 
+    await expect(await accountPage.getWelcomeText()).toBeVisible();
     await expect(await accountPage.getWelcomeText()).toHaveText(`Welcome ${newUser.firstName} ${newUser.lastName}`);
     await expect(await accountPage.getLogoutButton()).toBeVisible();
+  })
+
+  test('register a new user and login with it', async ({ page }) => {
+    await signupPage.inputFirstName(newUser.firstName);
+    await signupPage.inputLastName(newUser.lastName);
+    await signupPage.inputEmail(newUser.email);
+    await signupPage.inputPassword(newUser.password);
+    await signupPage.clickSubmit();
+
+    await expect(await accountPage.getWelcomeText()).toBeVisible();
+    await expect(await accountPage.getWelcomeText()).toHaveText(`Welcome ${newUser.firstName} ${newUser.lastName}`);
+    await (await accountPage.getLogoutButton()).click();
+
+    const loginPage = new LoginPage(page);
+    await loginPage.inputEmail(newUser.email);
+    await loginPage.inputPassword(newUser.password);
+    await loginPage.clickLogin();
+
+    await expect(await accountPage.getWelcomeText()).toBeVisible();
+    await expect(await accountPage.getWelcomeText()).toHaveText(`Welcome ${newUser.firstName} ${newUser.lastName}`);
   })
 
   test('signup with existing user', {
@@ -51,9 +73,8 @@ test.describe('Sign up page ', () => {
 
     await signupPage.clickSubmit();
 
-    expect(logs).toContain('User already exists');
-
     //Here should be proper assertions after implementation of error message
+    expect(logs).toContain('User already exists');
   })
 
   test('handling too short password', async ({ }) => {
